@@ -2,7 +2,7 @@
 # décomposer n
 from copy import deepcopy
 
-n = 45
+n = 46
 
 solutions = []  # contiendra l'ensemble des solutions
 for i in range(0, n + 1):
@@ -53,8 +53,10 @@ def corrections_kakuro():
     for nombre in range(n):
         solutions_corrigees.append([])  # contient les solutions corrigés pour le nombre actuel
         for sol in solutions[nombre]:
+            if len(sol)<=1: # s'il n'y a qu'une solution ou 0
+                continue # on arrete
             if sol[0] > 9:  # on vérifie si c'est bien un chiffre
-                continue  # si c'est pas le cas on arrâte, sinon on c'est que ils sont tous entre 1 et 9 car c'est
+                continue  # si c'est pas le cas on arrête, sinon on c'est que ils sont tous entre 1 et 9 car c'est
                 # décroissant
             else:
                 for chiffre in range(len(sol) - 1):
