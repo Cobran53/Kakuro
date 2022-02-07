@@ -1,5 +1,5 @@
 import csv
-from tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label, LabelFrame
+from tkinter import Tk,LabelFrame, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label, StringVar, Entry
 from tkinter.filedialog import askopenfilename
 from functools import partial
 
@@ -13,6 +13,8 @@ class Case_vide:
         self.sumy = sumy
 
 
+from os.path import abspath
+
 class Grid:
     def __init__(self):
         self.root = Tk()
@@ -21,8 +23,14 @@ class Grid:
         self.label_kakuro = Label(self.root, text="Kakuro")
         self.label_kakuro.grid(row=0, column=0)
 
+        self.label_directory = Label(self.root, text="Dossier des niveaux :")
+        self.var_directory = StringVar(abspath('%USERPROFILE%/Desktop'))
+        self.entry_directory = Entry(self.root, textvariable=self.var_directory)
+        self.label_directory.grid(row=1, column=0)
+        self.entry_directory.grid(row=2, column=0)
+
         self.bouton_kakuro = Button(self.root, text="Jouer !", command=self.jeu_debut)
-        self.bouton_kakuro.grid(row=1, column=0)
+        self.bouton_kakuro.grid(row=3, column=0)
 
     def jeu_debut(self):
         self.label_kakuro.destroy()
@@ -47,9 +55,9 @@ class Grid:
                     elif grid[lig][col] == [" "]:  # la case est blanche, on peut la modifier
                         self.cases_modifiables.append((lig, col))
                     else:
-                        if grid[lig][col][0] != [" "]:
+                        if grid[lig][col][0] not in ([" "], "", " "):
                             self.cases_sommes.append((grid[lig][col][0], 'v', lig, col))
-                        if grid[lig][col][1] != [" "]:
+                        if grid[lig][col][1] not in ([" "], "", " "):
                             self.cases_sommes.append((grid[lig][col][1], 'h', lig, col))
 
         # création du conteneur de toutes les cells
@@ -68,7 +76,7 @@ class Grid:
                                  highlightcolor="black", highlightthickness=1,
                                  width=50, height=50, padx=3, pady=3)
                     cell.grid(row=row, column=column)
-                    case = ""
+                    case = Case_vide(row, column)
                     self.cells[(row, column)] = (cell, case)
                 else:
                     cell = Frame(self.center, bg='gray', highlightbackground="black",
@@ -80,6 +88,38 @@ class Grid:
                     canvas.grid()
                     self.cells[(row, column)] = (cell, canvas)
 
+        for somme in self.cases_sommes:
+            if somme[1] == "h":
+                self.cells[(somme[2], somme[3])][1].create_text(40, 25, text=str(somme[0]), state="disabled",
+                                                                font=("Segoe UI", 10, "bold"))
+                self.cells[(somme[2], somme[3])][1].create_line(48, 0, 24, 24, 48, 48, width=3, joinstyle="miter")
+                horizontal = somme[3] + 1
+                while (somme[2], horizontal) in self.cases_modifiables and horizontal != 9:
+                    self.cells[(somme[2], horizontal)][1].sumx = somme[0]
+                    horizontal += 1
+                if horizontal != 9:
+                    self.cells[(somme[2], horizontal)][1].create_text(7, 25, text=str(somme[0]), state="disabled",
+                                                                    font=("Segoe UI", 10, "bold"))
+                    self.cells[(somme[2], horizontal)][1].create_line(0, 0, 24, 24, 0, 48, width=3, joinstyle="miter")
+            elif somme[1] == "v":
+                self.cells[(somme[2], somme[3])][1].create_text(25, 40, text=str(somme[0]), state="disabled",
+                                                                font=("Segoe UI", 10, "bold"))
+                self.cells[(somme[2], somme[3])][1].create_line(0, 48, 24, 24, 48, 48, width=3, joinstyle="miter")
+                vertical = somme[2] + 1
+                while (vertical, somme[3]) in self.cases_modifiables and vertical != 9:
+                    self.cells[(vertical, somme[3])][1].sumy = somme[0]
+                    vertical += 1
+                if vertical != 9:
+                    self.cells[(vertical, somme[3])][1].create_text(25, 7, text=str(somme[0]), state="disabled",
+                                                                      font=("Segoe UI", 10, "bold"))
+                    self.cells[(vertical, somme[3])][1].create_line(0, 0, 24, 24, 48, 0, width=3, joinstyle="miter")
+class Case_vide:
+    def __init__(self, x, y, valeur="", sumx=0, sumy=0):
+        self.x = x
+        self.y = y
+        self.valeur = valeur
+        self.sumx = sumx
+        self.sumy = sumy
 
 def click(Btn):
     # test the button command click
