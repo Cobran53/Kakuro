@@ -1,6 +1,7 @@
 import csv
-from tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label
+from tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label, StringVar, Entry
 from tkinter.filedialog import askopenfilename
+from os.path import abspath
 
 class Grid:
     def __init__(self):
@@ -10,8 +11,14 @@ class Grid:
         self.label_kakuro = Label(self.root, text="Kakuro")
         self.label_kakuro.grid(row=0, column=0)
 
+        self.label_directory = Label(self.root, text="Dossier des niveaux :")
+        self.var_directory = StringVar(abspath('%USERPROFILE%/Desktop'))
+        self.entry_directory = Entry(self.root, textvariable=self.var_directory)
+        self.label_directory.grid(row=1, column=0)
+        self.entry_directory.grid(row=2, column=0)
+
         self.bouton_kakuro = Button(self.root, text="Jouer !", command=self.jeu_debut)
-        self.bouton_kakuro.grid(row=1, column=0)
+        self.bouton_kakuro.grid(row=3, column=0)
 
     def jeu_debut(self):
         self.label_kakuro.destroy()
