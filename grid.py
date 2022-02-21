@@ -2,6 +2,7 @@ import csv
 from tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label, StringVar, Entry
 from tkinter.filedialog import askopenfilename, askdirectory
 from os.path import expanduser
+from functools import partial
 
 
 class Grid:
@@ -127,6 +128,44 @@ class Case_vide:
 
     def draw(self, numero):
         dico = {1: ((10, 32, 32, 32), (21, 32, 21, 10), (21, 10, ))}
+
+
+def click(Btn):
+    # test the button command click
+    s = "Button %s clicked" % Btn
+    root.title(s)
+
+
+# creation de la frame pour le numpad
+# relief='groove' and labelanchor='nw' are default
+lf = LabelFrame(root, text=" numpad ", bd=3) #deplacer pour root
+lf.pack(padx=15, pady=10)
+
+# liste avec les buttons
+Btn_list = [
+    '7', '8', '9',
+    '4', '5', '6',
+    '1', '2', '3',
+    '', 'erase', '']
+# cree et positionne les buttons
+r = 1  # row
+c = 0  # column
+n = 0
+Btn = list(range(len(Btn_list)))
+for label in Btn_list:
+    # partial takes care of function and argument
+    cmd = partial(click, label)
+    # cree les buttons
+    Btn[n] = tk.Button(lf, text=label, width=5, command=cmd)
+    # positionne les buttons
+    Btn[n].grid(row=r, column=c)
+    # augmentaion de l'index du boutton
+    n = n + 1
+    # diposition column et row
+    c = c + 1
+    if c > 3:
+        c = 0
+        r = r + 1
 
 
 def main():
