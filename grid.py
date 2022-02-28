@@ -1,6 +1,7 @@
 import csv
+from tkinter.filedialog import askopenfilename, askdirectory
+from os.path import expanduser
 from tkinter import Tk, LabelFrame, Canvas, Frame, Button, Label, StringVar, Entry
-from tkinter.filedialog import askopenfilename
 from functools import partial
 
 
@@ -72,7 +73,7 @@ class Grid:
                                  highlightcolor="black", highlightthickness=1,
                                  width=50, height=50, padx=3, pady=3)
                     cell.grid(row=row, column=column)
-                    case = Case_vide(row, column, cell)
+                    case = CaseVide(row, column, cell)
                     self.cells[(row, column)] = (cell, case)
                 else:
                     cell = Frame(self.center, bg='gray', highlightbackground="black",
@@ -111,7 +112,7 @@ class Grid:
                     self.cells[(vertical, somme[3])][1].create_line(0, 0, 24, 24, 48, 0, width=3, joinstyle="miter")
 
 
-class Case_vide:
+class CaseVide:
     def __init__(self, x, y, parent, valeur="", sumx=0, sumy=0):
         self.x = x
         self.y = y
@@ -126,22 +127,22 @@ class Case_vide:
         self.canvas.create_oval(event.x, event.y, event.x + 5, event.y + 5)
 
     def draw(self, numero):
-        dico = {1: ((10, 32, 32, 32), (21, 32, 21, 10), (21, 10, ))}
+        self.canvas.create_text(21, 21, text=str(numero), font=("Segoe UI", 10, "bold"))
 
 
-def click(Btn):
+def click(btn):
     # test the button command click
-    s = "Button %s clicked" % Btn
+    s = "Button %s clicked" % btn
     Tk.title(s)
 
 
 # creation de la frame pour le numpad
 # relief='groove' and labelanchor='nw' are default
-lf = LabelFrame(Tk(), text=" numpad ", bd=3) #deplacer pour root
+lf = LabelFrame(Tk(), text=" numpad ", bd=3)  # deplacer pour root
 lf.pack(padx=15, pady=10)
 
 # liste avec les buttons
-Btn_list = [
+btn_list = [
     '7', '8', '9',
     '4', '5', '6',
     '1', '2', '3',
@@ -150,14 +151,14 @@ Btn_list = [
 r = 1  # row
 c = 0  # column
 n = 0
-Btn = list(range(len(Btn_list)))
-for label in Btn_list:
+btn = list(range(len(btn_list)))
+for label in btn_list:
     # partial takes care of function and argument
     cmd = partial(click, label)
     # cree les buttons
-    Btn[n] = Button(lf, text=label, width=5, command=cmd)
+    btn[n] = Button(lf, text=label, width=5, command=cmd)
     # positionne les buttons
-    Btn[n].grid(row=r, column=c)
+    btn[n].grid(row=r, column=c)
     # augmentaion de l'index du boutton
     n = n + 1
     # diposition column et row
