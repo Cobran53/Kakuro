@@ -5,6 +5,7 @@ from tkinter import Tk, LabelFrame, Canvas, Frame, Button, Label, StringVar, Ent
 from functools import partial
 
 
+# noinspection PyUnresolvedReferences
 class Grid:
     def __init__(self):
         self.root = Tk()
@@ -23,6 +24,8 @@ class Grid:
 
         self.bouton_kakuro = Button(self.root, text="Jouer !", command=self.jeu_debut)
         self.bouton_kakuro.grid(row=4, column=0)
+
+        self.bouton_presse = False
 
     def parcourir(self):
         directory = askdirectory(title="Ouvrez le dossier contenant les niveaux", initialdir=self.var_directory.get(),
@@ -73,7 +76,7 @@ class Grid:
                                  highlightcolor="black", highlightthickness=1,
                                  width=50, height=50, padx=3, pady=3)
                     cell.grid(row=row, column=column)
-                    case = CaseVide(row, column, cell)
+                    case = CaseVide(row, column, cell, self)
                     self.cells[(row, column)] = (cell, case)
                 else:
                     cell = Frame(self.center, bg='gray', highlightbackground="black",
@@ -111,61 +114,75 @@ class Grid:
                                                                     font=("Segoe UI", 10, "bold"))
                     self.cells[(vertical, somme[3])][1].create_line(0, 0, 24, 24, 48, 0, width=3, joinstyle="miter")
 
+        # --Numpad--
+        self.numpad = Tk()
+
+        # creation de la frame pour le numpad
+        # relief='groove' and labelanchor='nw' are default
+        self.lf = LabelFrame(self.numpad, text=" numpad ", bd=3)  # deplacer pour root
+        self.lf.pack(padx=15, pady=10)
+
+        # liste avec les buttons
+        self.button_list = [
+            '7', '8', '9',
+            '4', '5', '6',
+            '1', '2', '3',
+            'accueil', 'effacer', 'solveur']
+        # cree et positionne les buttons
+        r = 1  # row
+        c = 0  # column
+        n = 0
+        self.buttons = list(range(len(self.button_list)))
+        print(self.buttons)
+        for label in self.button_list:
+            # partial crée une autre fonction qui appelle click en donnant pour argument label
+            cmd = partial(self.click, label)
+            # cree les buttons
+            self.buttons[n] = Button(self.lf, text=label, width=5, command=cmd)
+            # positionne les buttons
+            self.buttons[n].grid(row=r, column=c)
+            # augmentaion de l'index du boutton
+            n = n + 1
+            # diposition column et row
+            c = c + 1
+            if c > 2:
+                c = 0
+                r = r + 1
+
+    def click(self, btn):
+        if btn not in ["accueil", "option"]:
+            index_btn = self.button_list.index(btn)
+            self.buttons[index_btn].config(relief="sunken", state="disabled")
+            if self.bouton_presse != False:
+                self.buttons[self.button_list.index(str(self.bouton_presse))].config(relief="raised", state="active")
+            self.bouton_presse = btn
+
 
 class CaseVide:
-    def __init__(self, x, y, parent, valeur="", sumx=0, sumy=0):
+    def __init__(self, x, y, parent, grille, valeur="", sumx=0, sumy=0):
         self.x = x
         self.y = y
         self.valeur = valeur
+
+        """
         self.sumx = sumx
         self.sumy = sumy
+        """
+
+        self.grille = grille
+
         self.canvas = Canvas(parent, bg='white', borderwidth=0, highlightthickness=0, width=42, height=42)
         self.canvas.bind('<Button-1>', self.canvas_click_event)
         self.canvas.pack()
 
     def canvas_click_event(self, event):
-        self.canvas.create_oval(event.x, event.y, event.x + 5, event.y + 5)
-
-    def draw(self, numero):
-        self.canvas.create_text(21, 21, text=str(numero), font=("Segoe UI", 10, "bold"))
-
-
-def click(btn):
-    # test the button command click
-    s = "Button %s clicked" % btn
-    Tk.title(s)
-
-
-# creation de la frame pour le numpad
-# relief='groove' and labelanchor='nw' are default
-lf = LabelFrame(Tk(), text=" numpad ", bd=3)  # deplacer pour root
-lf.pack(padx=15, pady=10)
-
-# liste avec les buttons
-btn_list = [
-    '7', '8', '9',
-    '4', '5', '6',
-    '1', '2', '3',
-    'accueil', 'effacer', 'option']
-# cree et positionne les buttons
-r = 1  # row
-c = 0  # column
-n = 0
-btn = list(range(len(btn_list)))
-for label in btn_list:
-    # partial takes care of function and argument
-    cmd = partial(click, label)
-    # cree les buttons
-    btn[n] = Button(lf, text=label, width=5, command=cmd)
-    # positionne les buttons
-    btn[n].grid(row=r, column=c)
-    # augmentaion de l'index du boutton
-    n = n + 1
-    # diposition column et row
-    c = c + 1
-    if c > 2:
-        c = 0
-        r = r + 1
+        if self.grille.bouton_presse in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+            self.canvas.delete('all') # efface le canvas
+            self.canvas.create_text(21, 21, text=self.grille.bouton_presse, font=("Segoe UI", 25))
+            self.valeur = self.grille.bouton_presse
+        if self.grille.bouton_presse == "effacer":
+            self.canvas.delete('all')
+            self.valeur = self.grille.bouton_presse
 
 
 def main():
