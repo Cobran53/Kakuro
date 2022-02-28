@@ -1,7 +1,6 @@
 import csv
-from tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label, StringVar, Entry
-from tkinter.filedialog import askopenfilename, askdirectory
-from os.path import expanduser
+from tkinter import Tk, LabelFrame, Canvas, Frame, Button, Label, StringVar, Entry
+from tkinter.filedialog import askopenfilename
 from functools import partial
 
 
@@ -133,12 +132,12 @@ class Case_vide:
 def click(Btn):
     # test the button command click
     s = "Button %s clicked" % Btn
-    root.title(s)
+    Tk.title(s)
 
 
 # creation de la frame pour le numpad
 # relief='groove' and labelanchor='nw' are default
-lf = LabelFrame(root, text=" numpad ", bd=3) #deplacer pour root
+lf = LabelFrame(Tk(), text=" numpad ", bd=3) #deplacer pour root
 lf.pack(padx=15, pady=10)
 
 # liste avec les buttons
@@ -146,7 +145,7 @@ Btn_list = [
     '7', '8', '9',
     '4', '5', '6',
     '1', '2', '3',
-    '', 'erase', '']
+    'accueil', 'effacer', 'option']
 # cree et positionne les buttons
 r = 1  # row
 c = 0  # column
@@ -156,14 +155,14 @@ for label in Btn_list:
     # partial takes care of function and argument
     cmd = partial(click, label)
     # cree les buttons
-    Btn[n] = tk.Button(lf, text=label, width=5, command=cmd)
+    Btn[n] = Button(lf, text=label, width=5, command=cmd)
     # positionne les buttons
     Btn[n].grid(row=r, column=c)
     # augmentaion de l'index du boutton
     n = n + 1
     # diposition column et row
     c = c + 1
-    if c > 3:
+    if c > 2:
         c = 0
         r = r + 1
 
