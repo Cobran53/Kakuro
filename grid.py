@@ -1,4 +1,5 @@
 import csv
+import tkinter
 from tkinter import Tk,LabelFrame, Canvas, Frame, Button, BOTH, TOP, RIGHT, Label, StringVar, Entry
 from tkinter.filedialog import askopenfilename
 from functools import partial
@@ -24,7 +25,7 @@ class Grid:
         self.label_kakuro.grid(row=0, column=0)
 
         self.label_directory = Label(self.root, text="Dossier des niveaux :")
-        self.var_directory = StringVar(abspath('%USERPROFILE%/Desktop'))
+        self.var_directory = StringVar(value= abspath('%USERPROFILE%/Desktop'))
         self.entry_directory = Entry(self.root, textvariable=self.var_directory)
         self.label_directory.grid(row=1, column=0)
         self.entry_directory.grid(row=2, column=0)
@@ -124,12 +125,12 @@ class Case_vide:
 def click(Btn):
     # test the button command click
     s = "Button %s clicked" % Btn
-    root.title(s)
+    Tk.title(s)
 
 
 # creation de la frame pour le numpad
 # relief='groove' and labelanchor='nw' are default
-lf = LabelFrame(root, text=" numpad ", bd=3) #deplacer pour root
+lf = LabelFrame(Tk(), text=" numpad ", bd=3) #deplacer pour root
 lf.pack(padx=15, pady=10)
 
 # liste avec les buttons
@@ -137,7 +138,7 @@ Btn_list = [
     '7', '8', '9',
     '4', '5', '6',
     '1', '2', '3',
-    '', 'erase', '']
+    'accueil', 'effacer', 'option']
 # cree et positionne les buttons
 r = 1  # row
 c = 0  # column
@@ -147,14 +148,14 @@ for label in Btn_list:
     # partial takes care of function and argument
     cmd = partial(click, label)
     # cree les buttons
-    Btn[n] = tk.Button(lf, text=label, width=5, command=cmd)
+    Btn[n] = Button(lf, text=label, width=5, command=cmd)
     # positionne les buttons
     Btn[n].grid(row=r, column=c)
     # augmentaion de l'index du boutton
     n = n + 1
     # diposition column et row
     c = c + 1
-    if c > 3:
+    if c > 2:
         c = 0
         r = r + 1
 
