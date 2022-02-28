@@ -27,7 +27,7 @@ class Grid:
         self.bouton_kakuro = Button(self.root, text="Jouer !", command=self.jeu_debut)
         self.bouton_kakuro.grid(row=4, column=0)
 
-        self.bouton_presse = False
+        self.bouton_presse = None
 
     def parcourir(self):
         directory = askdirectory(title="Ouvrez le dossier contenant les niveaux", initialdir=self.var_directory.get(),
@@ -40,14 +40,15 @@ class Grid:
             ('Tous les fichiers', '*.*')
         )
 
-        self.filename = askopenfilename(title='Ouvrez une grille', initialdir=self.var_directory.get(), filetypes=filetypes)
+        self.filename = askopenfilename(title='Ouvrez une grille', initialdir=self.var_directory.get(),
+                                        filetypes=filetypes)
 
         for widget in self.root.winfo_children():
             widget.destroy()
 
         self.lecture_grille()
         self.creation_cases()
-        self.numpad()
+        self.creation_numpad()
 
     def lecture_grille(self):
         with open(self.filename, "r") as file:
@@ -124,7 +125,7 @@ class Grid:
                                                                     font=("Segoe UI", 10, "bold"))
                     self.cells[(vertical, somme[3])][1].create_line(0, 0, 24, 24, 48, 0, width=3, joinstyle="miter")
 
-    def numpad(self):
+    def creation_numpad(self):
         # -- cration du numpad--
         self.numpad = Tk()
 
@@ -162,7 +163,7 @@ class Grid:
         if btn not in ["accueil", "solveur"]:
             index_btn = self.button_list.index(btn)
             self.buttons[index_btn].config(relief="sunken", state="disabled")
-            if self.bouton_presse != False:
+            if self.bouton_presse != None:
                 self.buttons[self.button_list.index(str(self.bouton_presse))].config(relief="raised", state="active")
             self.bouton_presse = btn
         elif btn == "accueil":
@@ -190,12 +191,11 @@ class CaseVide:
         self.canvas.pack()
 
     def canvas_click_event(self, event):
+        self.canvas.delete('all')  # efface le canvas
         if self.grille.bouton_presse in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
-            self.canvas.delete('all') # efface le canvas
             self.canvas.create_text(21, 21, text=self.grille.bouton_presse, font=("Segoe UI", 25))
             self.valeur = self.grille.bouton_presse
-        if self.grille.bouton_presse == "effacer":
-            self.canvas.delete('all')
+        elif self.grille.bouton_presse == "effacer":
             self.valeur = self.grille.bouton_presse
 
 
