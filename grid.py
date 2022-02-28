@@ -10,7 +10,9 @@ class Grid:
     def __init__(self):
         self.root = Tk()
         self.root.title('Kakuro')
+        self.accueil()
 
+    def accueil(self):
         self.label_kakuro = Label(self.root, text="Kakuro", font=("Arial", 15, "bold"))
         self.label_kakuro.grid(row=0, column=0)
 
@@ -33,33 +35,39 @@ class Grid:
         self.var_directory.set(directory)
 
     def jeu_debut(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
-
         filetypes = (
             ('Fichier csv', '*.csv'),
             ('Tous les fichiers', '*.*')
         )
 
-        filename = askopenfilename(title='Ouvrez une grille', initialdir=self.var_directory.get(), filetypes=filetypes)
+        self.filename = askopenfilename(title='Ouvrez une grille', initialdir=self.var_directory.get(), filetypes=filetypes)
 
-        with open(filename, "r") as file:
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        self.lecture_grille()
+        self.creation_cases()
+        self.numpad()
+
+    def lecture_grille(self):
+        with open(self.filename, "r") as file:
             reader = csv.reader(file)
-            grid = [[elt.split("\\") for elt in row] for row in reader]
+            self.grid = [[elt.split("\\") for elt in row] for row in reader]
             self.cases_modifiables = []  # format : (lig, col)
             self.cases_sommes = []  # format : (somme, "v"/"h", lig, col)
-            for lig in range(len(grid)):
-                for col in range(len(grid[lig])):
-                    if grid[lig][col] == [" ", " "]:  # la case est grise sans somme, on ignore
+            for lig in range(len(self.grid)):
+                for col in range(len(self.grid[lig])):
+                    if self.grid[lig][col] == [" ", " "]:  # la case est grise sans somme, on ignore
                         continue
-                    elif grid[lig][col] == [" "]:  # la case est blanche, on peut la modifier
+                    elif self.grid[lig][col] == [" "]:  # la case est blanche, on peut la modifier
                         self.cases_modifiables.append((lig, col))
                     else:
-                        if grid[lig][col][0] not in ([" "], "", " "):
-                            self.cases_sommes.append((grid[lig][col][0], 'v', lig, col))
-                        if grid[lig][col][1] not in ([" "], "", " "):
-                            self.cases_sommes.append((grid[lig][col][1], 'h', lig, col))
+                        if self.grid[lig][col][0] not in ([" "], "", " "):
+                            self.cases_sommes.append((self.grid[lig][col][0], 'v', lig, col))
+                        if self.grid[lig][col][1] not in ([" "], "", " "):
+                            self.cases_sommes.append((self.grid[lig][col][1], 'h', lig, col))
 
+    def creation_cases(self):
         # création du conteneur de toutes les cells
         self.center = Frame(self.root, bg='white', width=450, height=450, padx=3, pady=3)
 
@@ -68,9 +76,10 @@ class Grid:
         self.center.grid_rowconfigure(0, weight=1)
         self.center.grid_columnconfigure(1, weight=1)
 
+        # -- création des cases --
         self.cells = {}  # format (row, column) : (Frame, Case|Canvas)
-        for row in range(len(grid)):
-            for column in range(len(grid[0])):
+        for row in range(len(self.grid)):
+            for column in range(len(self.grid[0])):
                 if (row, column) in self.cases_modifiables:
                     cell = Frame(self.center, bg='white', highlightbackground="black",
                                  highlightcolor="black", highlightthickness=1,
@@ -88,6 +97,7 @@ class Grid:
                     canvas.grid()
                     self.cells[(row, column)] = (cell, canvas)
 
+        # -- remplissages des cases sommes --
         for somme in self.cases_sommes:
             if somme[1] == "h":
                 self.cells[(somme[2], somme[3])][1].create_text(40, 25, text=str(somme[0]), state="disabled",
@@ -114,12 +124,11 @@ class Grid:
                                                                     font=("Segoe UI", 10, "bold"))
                     self.cells[(vertical, somme[3])][1].create_line(0, 0, 24, 24, 48, 0, width=3, joinstyle="miter")
 
-        # --Numpad--
+    def numpad(self):
+        # -- cration du numpad--
         self.numpad = Tk()
 
-        # creation de la frame pour le numpad
-        # relief='groove' and labelanchor='nw' are default
-        self.lf = LabelFrame(self.numpad, text=" numpad ", bd=3)  # deplacer pour root
+        self.lf = LabelFrame(self.numpad, text=" numpad ", bd=3)
         self.lf.pack(padx=15, pady=10)
 
         # liste avec les buttons
@@ -150,12 +159,17 @@ class Grid:
                 r = r + 1
 
     def click(self, btn):
-        if btn not in ["accueil", "option"]:
+        if btn not in ["accueil", "solveur"]:
             index_btn = self.button_list.index(btn)
             self.buttons[index_btn].config(relief="sunken", state="disabled")
             if self.bouton_presse != False:
                 self.buttons[self.button_list.index(str(self.bouton_presse))].config(relief="raised", state="active")
             self.bouton_presse = btn
+        elif btn == "accueil":
+            self.numpad.destroy()
+            for widget in self.root.winfo_children():
+                widget.destroy()
+            self.accueil()
 
 
 class CaseVide:
