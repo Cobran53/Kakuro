@@ -49,6 +49,7 @@ class Grid:
         self.lecture_grille()
         self.creation_cases()
         self.creation_numpad()
+        self.donnees_solveur()
 
     def lecture_grille(self):
         with open(self.filename, "r") as file:
@@ -67,6 +68,96 @@ class Grid:
                             self.cases_sommes.append((self.grid[lig][col][0], 'v', lig, col))
                         if self.grid[lig][col][1] not in ([" "], "", " "):
                             self.cases_sommes.append((self.grid[lig][col][1], 'h', lig, col))
+
+    def donnees_solveur(self):
+        taille = len(self.grid)
+        lig, col = [0 for _ in range(taille)], [0 for _ in range(taille)]
+        for case in self.cases_sommes:
+            if case[1] == "v":
+                col[case[3]] += 1  # On compte le nombre de blocs dans chaque colonne
+            elif case[1] == "h":
+                lig[case[2]] += 1
+        print(lig, "\n", col)  # et même chose dans chaque ligne
+        nb_blocs_max = max(max(*lig), max(*col))
+
+        bloc_ligne = [
+            [{"debut": None, "fin": None, "somme": None} for _ in range(nb_blocs_max)]
+            for _ in range(taille)]
+        bloc_colonne = [
+            [{"debut": None, "fin": None, "somme": None} for _ in range(nb_blocs_max)]
+            for _ in range(taille)]
+
+        for x in range(1, taille):
+            for y in range(1, taille):
+                if (x, y) in self.cases_modifiables:
+                    if x != 0 and (x - 1, y) not in self.cases_modifiables:  # x!=0 n'est pas nécessaire, mais au cas ou
+                        bloc = 0
+                        while bloc_colonne[y][bloc]["debut"] is not None:
+                            bloc += 1
+                        bloc_colonne[y][bloc]["debut"] = x
+                    if x != taille - 1 and (x + 1, y) not in self.cases_modifiables:
+                        bloc = 0
+                        while bloc_colonne[y][bloc]["fin"] is not None:
+                            bloc += 1
+                        bloc_colonne[y][bloc]["fin"] = x
+                    if y != 0 and (x, y - 1) not in self.cases_modifiables:  # y!=0 n'est pas nécessaire, mais au cas ou
+                        bloc = 0
+                        while bloc_ligne[x][bloc]["debut"] is not None:
+                            bloc += 1
+                        bloc_ligne[x][bloc]["debut"] = y
+                    if y != taille - 1 and (x, y + 1) not in self.cases_modifiables:
+                        bloc = 0
+                        while bloc_ligne[x][bloc]["fin"] is not None:
+                            bloc += 1
+                        bloc_ligne[x][bloc]["fin"] = y
+
+        for case in self.cases_sommes:
+            if case[1] == "h":
+                bloc = 0
+                while bloc_ligne[case[2]][bloc]["somme"] is not None:
+                    bloc += 1
+                if bloc_ligne[case[2]][bloc]["debut"] == None:
+                    pass  # ne devrait pas arriver, attention
+                elif bloc_ligne[case[2]][bloc]["fin"] == None:
+                    bloc_ligne[case[2]][bloc]["fin"] = taille - 1  # Si la fin c'est le bout de la ligne,
+                    # ce n'est pas détecté, on le fait donc ici
+                bloc_ligne[case[2]][bloc]["somme"] = int(case[0])
+            elif case[1] == "v":
+                bloc = 0
+                while bloc_colonne[case[3]][bloc]["somme"] is not None:
+                    bloc += 1
+                if bloc_colonne[case[3]][bloc]["debut"] == None:
+                    pass  # ne devrait pas arriver, attention
+                elif bloc_colonne[case[3]][bloc]["fin"] == None:
+                    bloc_colonne[case[3]][bloc]["fin"] = taille - 1
+                bloc_colonne[case[3]][bloc]["somme"] = int(case[0])
+
+        bLa = []
+        bLb = []
+        bLs = []
+        for ligne in bloc_ligne:
+            bLa.append([])
+            bLb.append([])
+            bLs.append([])
+            for bloc in ligne:
+                bLa[-1].append(bloc["debut"])
+                bLb[-1].append(bloc["fin"])
+                bLs[-1].append(bloc["somme"])
+        bCa = []
+        bCb = []
+        bCs = []
+        for ligne in bloc_ligne:
+            bCa.append([])
+            bCb.append([])
+            bCs.append([])
+            for bloc in ligne:
+                bCa[-1].append(bloc["debut"])
+                bCb[-1].append(bloc["fin"])
+                bCs[-1].append(bloc["somme"])
+
+
+        print(bLs)
+
 
     def creation_cases(self):
         # création du conteneur de toutes les cells
@@ -163,7 +254,7 @@ class Grid:
         if btn not in ["accueil", "solveur"]:
             index_btn = self.button_list.index(btn)
             self.buttons[index_btn].config(relief="sunken", state="disabled")
-            if self.bouton_presse != None:
+            if self.bouton_presse is not None:
                 self.buttons[self.button_list.index(str(self.bouton_presse))].config(relief="raised", state="active")
             self.bouton_presse = btn
         elif btn == "accueil":
@@ -174,7 +265,7 @@ class Grid:
 
 
 class CaseVide:
-    def __init__(self, x, y, parent, grille, valeur="", sumx=0, sumy=0):
+    def __init__(self, x, y, parent, grille, valeur=""):
         self.x = x
         self.y = y
         self.valeur = valeur
@@ -190,7 +281,7 @@ class CaseVide:
         self.canvas.bind('<Button-1>', self.canvas_click_event)
         self.canvas.pack()
 
-    def canvas_click_event(self, event):
+    def canvas_click_event(self, _):
         self.canvas.delete('all')  # efface le canvas
         if self.grille.bouton_presse in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
             self.canvas.create_text(21, 21, text=self.grille.bouton_presse, font=("Segoe UI", 25))
