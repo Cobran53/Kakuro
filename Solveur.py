@@ -3,7 +3,7 @@ from pulp import *
 def solv(K, n, bLa, bLb, bLs, bCa, bCb, bCs):
     prob = LpProblem("KakuroSolv", LpMinimize)
 
-    x = LpVariable.dicts("x", ((range(int(n))), (range(n)), (range(10)), 'Binary'))
+    x = LpVariable("x", ((range(int(n))), (range(n)), (range(10)), 'Binary'))
 
     # prob += (lpSum([x[for i in range(0,n), for j in range (0,n),for u in range (0,9)]]))
 
