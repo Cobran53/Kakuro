@@ -6,18 +6,19 @@ prob = LpProblem("KakuroSolv", LpMinimize)
 # nb max de sommes par lignes et colonnes
 K = LpVariable(3)
 # nb case max par ligne et colonnes
-n = LpVariable(9)
+n = LpVariable(10)
 
-bLa = LpVariable(("i", 1, n, "Integer"), ("k", 1, K, "Integer"))
-bLb = LpVariable(("i", 1, n, "Integer"), ("k", 1, K, "Integer"))
-bLs = LpVariable(("i", 1, n, "Integer"), ("k", 1, K, "Integer"))
-bCa = LpVariable(("j", 1, n, "Integer"), ("k", 1, K, "Integer"))
-bCb = LpVariable(("j", 1, n, "Integer"), ("k", 1, K, "Integer"))
-bCs = LpVariable(("j", 1, n, "Integer"), ("k", 1, K, "Integer"))
+bLa = LpVariable(("i", 0, n, "Integer"), ("k", 0, K, "Integer"))
+bLb = LpVariable(("i", 0, n, "Integer"), ("k", 0, K, "Integer"))
+bLs = LpVariable(("i", 0, n, "Integer"), ("k", 0, K, "Integer"))
+bCa = LpVariable(("j", 0, n, "Integer"), ("k", 0, K, "Integer"))
+bCb = LpVariable(("j", 0, n, "Integer"), ("k", 0, K, "Integer"))
+bCs = LpVariable(("j", 0, n, "Integer"), ("k", 0, K, "Integer"))
 
-x = LpVariable.dicts("x",(("i" in range (1,n)), ("j" in range(1,n)), ("u" in range(1,9)) , "Binary"))
+x = LpVariable.dicts("x", ((range (int(n))
+                            ), (range(n)), (range(10)) , 'Binary'))
 
-prob += LpMinimize(Sum([x]))
+#prob += (lpSum([x[for i in range(0,n), for j in range (0,n),for u in range (0,9)]]))
 
 #contraintes
 
@@ -32,9 +33,27 @@ for i in range (n) :
         for j in range (bLa[i,k], bLb[i,k]+1):
             prob += lpSum([x[i][j][u] for u in range(10)])*bLs[i,k] >= bLs[i,k]
 
-constraint_2 = LpConstraint()
-constraint_3 = LpConstraint()
-constraint_4 = Lpconstraint()
+#ctr1
+for i in range (n) :
+    for k in range (K):
+        prob += lpSum(u*[x[i][j][u] for u in range(10) for j in range(bLa[i,k], bLb[i,k])]) == bLs[i,k]
+
+#ctr2
+for i in range (n) :
+    for k in range (K):
+        for u in range (10):
+            prob += lpSum(u*[x[i][j][u] for j in range(bLa[i,k], bLb[i,k])]) <= 1
+
+#ctr3
+for j in range (n) :
+    for k in range (K):
+        prob += lpSum(u*[x[i][j][u] for u in range(10) for i in range(bCa[i,k], bCb[i,k])]) == bCs[i,k]
+
+#ctr4
+for j in range (n) :
+    for k in range (K):
+        for u in range (10):
+            prob += lpSum(u*[x[i][j][u] for i in range(bCa[i,k], bCb[i,k])]) <= 1
 
 #solve
 
