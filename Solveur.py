@@ -20,10 +20,17 @@ x = LpVariable.dicts("x",(("i" in range (1,n)), ("j" in range(1,n)), ("u" in ran
 prob += LpMinimize(Sum([x]))
 
 #contraintes
-for "i" in range(1,n) :
-    for "j" in range (1,n) :
-        prob += lpSum([x[i,j,u] for ])
 
+#contr_1
+for i in range(n) :
+    for j in range (n) :
+        prob += lpSum([x[i][j][u] for u in range(10)]) == 1
+
+#ctr0
+for i in range (n) :
+    for k in range (K):
+        for j in range (bLa[i,k], bLb[i,k]+1):
+            prob += lpSum([x[i][j][u] for u in range(10)])*bLs[i,k] >= bLs[i,k]
 
 constraint_2 = LpConstraint()
 constraint_3 = LpConstraint()
