@@ -49,7 +49,6 @@ class Grid:
         self.lecture_grille()
         self.creation_cases()
         self.creation_numpad()
-        self.donnees_solveur()
 
     def lecture_grille(self):
         with open(self.filename, "r") as file:
@@ -69,7 +68,8 @@ class Grid:
                         if self.grid[lig][col][1] not in ([" "], "", " "):
                             self.cases_sommes.append((self.grid[lig][col][1], 'h', lig, col))
 
-    def donnees_solveur(self):
+    def solveur(self):
+        from Solveur import solv
         taille = len(self.grid)
         lig, col = [0 for _ in range(taille)], [0 for _ in range(taille)]
         for case in self.cases_sommes:
@@ -126,38 +126,55 @@ class Grid:
                 bloc = 0
                 while bloc_colonne[case[3]][bloc]["somme"] is not None:
                     bloc += 1
-                if bloc_colonne[case[3]][bloc]["debut"] == None:
+                if bloc_colonne[case[3]][bloc]["debut"] is None:
                     pass  # ne devrait pas arriver, attention
-                elif bloc_colonne[case[3]][bloc]["fin"] == None:
+                elif bloc_colonne[case[3]][bloc]["fin"] is None:
                     bloc_colonne[case[3]][bloc]["fin"] = taille - 1
                 bloc_colonne[case[3]][bloc]["somme"] = int(case[0])
 
-        bLa = []
-        bLb = []
-        bLs = []
+        for i in range(len(bloc_ligne)):
+            for j in range(len(bloc_ligne[i])):
+                if bloc_ligne[i][j]["debut"] == bloc_ligne[i][j]["somme"] == bloc_ligne[i][j]["fin"] == None:
+                    bloc_ligne[i][j]["debut"], bloc_ligne[i][j]["somme"], bloc_ligne[i][j]["fin"] = 0, 0, 0
+
+        for i in range(len(bloc_colonne)):
+            for j in range(len(bloc_colonne[i])):
+                if bloc_colonne[i][j]["debut"] == bloc_colonne[i][j]["somme"] == bloc_colonne[i][j]["fin"] == None:
+                    bloc_colonne[i][j]["debut"], bloc_colonne[i][j]["somme"], bloc_colonne[i][j]["fin"] = 0, 0, 0
+
+        bloc_ligne_debut = []
+        bloc_ligne_fin = []
+        bloc_ligne_somme = []
         for ligne in bloc_ligne:
-            bLa.append([])
-            bLb.append([])
-            bLs.append([])
+            bloc_ligne_debut.append([])
+            bloc_ligne_fin.append([])
+            bloc_ligne_somme.append([])
             for bloc in ligne:
-                bLa[-1].append(bloc["debut"])
-                bLb[-1].append(bloc["fin"])
-                bLs[-1].append(bloc["somme"])
-        bCa = []
-        bCb = []
-        bCs = []
+                bloc_ligne_debut[-1].append(bloc["debut"])
+                bloc_ligne_fin[-1].append(bloc["fin"])
+                bloc_ligne_somme[-1].append(bloc["somme"])
+        bloc_colonne_debut = []
+        bloc_colonne_fin = []
+        bloc_colonne_somme = []
         for ligne in bloc_ligne:
-            bCa.append([])
-            bCb.append([])
-            bCs.append([])
+            bloc_colonne_debut.append([])
+            bloc_colonne_fin.append([])
+            bloc_colonne_somme.append([])
             for bloc in ligne:
-                bCa[-1].append(bloc["debut"])
-                bCb[-1].append(bloc["fin"])
-                bCs[-1].append(bloc["somme"])
+                bloc_colonne_debut[-1].append(bloc["debut"])
+                bloc_colonne_fin[-1].append(bloc["fin"])
+                bloc_colonne_somme[-1].append(bloc["somme"])
 
+        dict = {"K": nb_blocs_max,
+                "n": taille,
+                "bLa": bloc_ligne_debut,
+                "bLb": bloc_ligne_fin,
+                "bLs": bloc_ligne_somme,
+                "bCa": bloc_colonne_debut,
+                "bCb": bloc_colonne_fin,
+                "bCs": bloc_colonne_somme}
 
-        print(bLs)
-
+        print(solv(**dict))
 
     def creation_cases(self):
         # création du conteneur de toutes les cells
@@ -262,6 +279,8 @@ class Grid:
             for widget in self.root.winfo_children():
                 widget.destroy()
             self.accueil()
+        elif btn == "solveur":
+            self.solveur()
 
 
 class CaseVide:
