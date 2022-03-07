@@ -53,8 +53,8 @@ def corrections_kakuro():
     for nombre in range(n):
         solutions_corrigees.append([])  # contient les solutions corrigés pour le nombre actuel
         for sol in solutions[nombre]:
-            if len(sol)<=1: # s'il n'y a qu'une solution ou 0
-                continue # on arrete
+            if len(sol) <= 1:  # s'il n'y a qu'une solution ou 0
+                continue  # on arrete
             if sol[0] > 9:  # on vérifie si c'est bien un chiffre
                 continue  # si c'est pas le cas on arrête, sinon on c'est que ils sont tous entre 1 et 9 car c'est
                 # décroissant
@@ -62,7 +62,7 @@ def corrections_kakuro():
                 for chiffre in range(len(sol) - 1):
                     if sol[chiffre] == sol[chiffre + 1]:  # pas deux fois le même chiffre
                         break
-                else: # for-else : si il n'y a pas eu de break, alors :
+                else:  # for-else : si il n'y a pas eu de break, alors :
                     solutions_corrigees[nombre].append(sol)  # la sol est valide et on l'ajoute
     solutions = deepcopy(solutions_corrigees)
 
@@ -72,11 +72,12 @@ def sauvegarder_dans_fichier():
     global n
     f = open("decompo.csv", 'w')
     for nombre in range(n):
+        f.write(str(nombre) + ": ")
         for i in range(0, len(solutions[nombre])):
             ligne = solutions[nombre][i]  # on prend toutes les solutions pour le nombre
             for j in range(0, len(ligne) - 1):
                 f.write(str(ligne[j]) + ",")
-            f.write(str(ligne[len(ligne) - 1]))  # on met pas de virgule pour le dernier
+            f.write(str(ligne[len(ligne) - 1]) + ";")  # on met un ; pour le dernier
             f.write("\n")
         f.write("\n")  # On laisse une ligne vide quand on change de nombre
     f.close()
