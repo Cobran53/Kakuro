@@ -156,11 +156,11 @@ class Grid:
         bloc_colonne_debut = []
         bloc_colonne_fin = []
         bloc_colonne_somme = []
-        for ligne in bloc_ligne:
+        for colonne in bloc_colonne:
             bloc_colonne_debut.append([])
             bloc_colonne_fin.append([])
             bloc_colonne_somme.append([])
-            for bloc in ligne:
+            for bloc in colonne:
                 bloc_colonne_debut[-1].append(bloc["debut"])
                 bloc_colonne_fin[-1].append(bloc["fin"])
                 bloc_colonne_somme[-1].append(bloc["somme"])
@@ -173,7 +173,8 @@ class Grid:
                 "bCa": bloc_colonne_debut,
                 "bCb": bloc_colonne_fin,
                 "bCs": bloc_colonne_somme}
-
+        print(bloc_ligne_debut, "++++++++++++++++++++++++++++")
+        print(bloc_colonne_debut, "-------------------------")
         print(solv(**dict))
 
     def creation_cases(self):
