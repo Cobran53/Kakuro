@@ -222,7 +222,7 @@ class Grid:
                 while (somme[2], horizontal) in self.cases_modifiables and horizontal != 9:
                     self.cells[(somme[2], horizontal)][1].sumx = somme[0]
                     horizontal += 1
-                if horizontal != 9:
+                if horizontal != len(self.grid):
                     self.cells[(somme[2], horizontal)][1].create_text(7, 25, text=str(somme[0]), state="disabled",
                                                                       font=("Segoe UI", 10, "bold"))
                     self.cells[(somme[2], horizontal)][1].create_line(0, 0, 24, 24, 0, 48, width=3, joinstyle="miter")
@@ -234,7 +234,7 @@ class Grid:
                 while (vertical, somme[3]) in self.cases_modifiables and vertical != 9:
                     self.cells[(vertical, somme[3])][1].sumy = somme[0]
                     vertical += 1
-                if vertical != 9:
+                if vertical != len(self.grid[0]):
                     self.cells[(vertical, somme[3])][1].create_text(25, 7, text=str(somme[0]), state="disabled",
                                                                     font=("Segoe UI", 10, "bold"))
                     self.cells[(vertical, somme[3])][1].create_line(0, 0, 24, 24, 48, 0, width=3, joinstyle="miter")
