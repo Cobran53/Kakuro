@@ -70,6 +70,7 @@ class Grid:
 
     def solveur(self):
         from Solveur import solv
+        from pulp import value
         taille = len(self.grid)
         lig, col = [0 for _ in range(taille)], [0 for _ in range(taille)]
         for case in self.cases_sommes:
@@ -173,9 +174,13 @@ class Grid:
                 "bCa": bloc_colonne_debut,
                 "bCb": bloc_colonne_fin,
                 "bCs": bloc_colonne_somme}
-        print(bloc_ligne_debut, "++++++++++++++++++++++++++++")
-        print(bloc_colonne_debut, "-------------------------")
-        print(solv(**dict))
+
+        x = solv(**dict)
+        for i, j in self.cases_modifiables:
+            for u in range(1, 10):
+                if value(x[i][j][u]) == 1:
+                    self.cells[(i, j)][1].value = u
+                    self.cells[(i, j)][1].canvas.create_text(21, 21, text=str(u), font=("Segoe UI", 25))
 
     def creation_cases(self):
         # création du conteneur de toutes les cells
