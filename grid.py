@@ -118,9 +118,9 @@ class Grid:
                 while bloc_ligne[case[2]][bloc]["somme"] is not None:
                     bloc += 1
                 if bloc_ligne[case[2]][bloc]["debut"] == None:
-                    pass  # ne devrait pas arriver, attention
+                    pass  # ca ne doit pas arriver, attention
                 elif bloc_ligne[case[2]][bloc]["fin"] == None:
-                    bloc_ligne[case[2]][bloc]["fin"] = taille - 1  # Si la fin c'est le bout de la ligne,
+                    bloc_ligne[case[2]][bloc]["fin"] = taille - 1  # Si la fin est le bout de la ligne,
                     # ce n'est pas détecté, on le fait donc ici
                 bloc_ligne[case[2]][bloc]["somme"] = int(case[0])
             elif case[1] == "v":

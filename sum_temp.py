@@ -32,7 +32,6 @@ def decomposition_partielle(k):
                     sol_nouvelles.append(sol_actuelle)  # l'ajouter à celles trouvées précédemment
     sol_nouvelles.append([1] * (k + 1))  # pour finir rien que des 1
     solutions[k + 1] = sol_nouvelles  # mise à jour en vue du traitement suivant
-    return
 
 
 def decomposition_totale():
@@ -40,7 +39,6 @@ def decomposition_totale():
     global n
     for k in range(1, n):
         decomposition_partielle(k)
-    return
 
 
 def corrections_kakuro():
@@ -56,14 +54,14 @@ def corrections_kakuro():
             if len(sol) <= 1:  # s'il n'y a qu'une solution ou 0
                 continue  # on arrete
             if sol[0] > 9:  # on vérifie si c'est bien un chiffre
-                continue  # si c'est pas le cas on arrête, sinon on c'est que ils sont tous entre 1 et 9 car c'est
+                continue  # si ce n'est pas le cas on arrête, sinon on sait qu'ils sont tous entre 1 et 9, car c'est
                 # décroissant
             else:
                 for chiffre in range(len(sol) - 1):
                     if sol[chiffre] == sol[chiffre + 1]:  # pas deux fois le même chiffre
                         break
                 else:  # for-else : si il n'y a pas eu de break, alors :
-                    solutions_corrigees[nombre].append(sol)  # la sol est valide et on l'ajoute
+                    solutions_corrigees[nombre].append(sol)  # la solution est valide et on l'ajoute
     solutions = deepcopy(solutions_corrigees)
 
 
